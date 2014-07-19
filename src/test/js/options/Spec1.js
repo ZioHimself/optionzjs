@@ -4,6 +4,7 @@
   var module      = QUnit.module,
       test        = QUnit.test,
       ok          = QUnit.ok,
+      equal       = QUnit.equal,
       strictEqual = QUnit.strictEqual,
       propEqual   = QUnit.propEqual,
       throws      = QUnit.throws,
@@ -500,5 +501,223 @@
       options.Some("something").toString(), '[Some something]',
       '`Some("something").toString()` should return `[Some something]`'
     )
+  });
+
+  module('options#objectPropertyOption');
+  test('options#objectPropertyOption loaded', function() {
+    ok(options.objectPropertyOption, '`options.objectPropertyOption` should be defined');
+  });
+  test('options#objectPropertyOption should return options#None for bad input', function() {
+    //noinspection JSCheckFunctionSignatures
+    strictEqual(
+      options.objectPropertyOption(), options.None,
+      'options#objectPropertyOption should return options#None if no arguments passed'
+    );
+    (function(undefined){
+      //noinspection JSCheckFunctionSignatures
+      strictEqual(
+        options.objectPropertyOption(undefined), options.None,
+        'options#objectPropertyOption should return options#None if propKey argument not passed'
+      )
+    })();
+    //noinspection JSCheckFunctionSignatures
+    strictEqual(
+      options.objectPropertyOption(null), options.None,
+      'options#objectPropertyOption should return options#None if propKey argument not passed'
+    );
+    (function(theNaN){
+      ok(theNaN !== theNaN, '`NaN` should not equal itself');
+      //noinspection JSCheckFunctionSignatures
+      strictEqual(
+        options.objectPropertyOption(theNaN), options.None,
+        'options#objectPropertyOption should return options#None if propKey argument not passed'
+      )
+    })(NaN);
+    //noinspection JSCheckFunctionSignatures
+    strictEqual(
+      options.objectPropertyOption({something:"something"}), options.None,
+      'options#objectPropertyOption should return options#None if no propKey argument not passed'
+    );
+  });
+  test('options#objectPropertyOption should return options#None when key not found', function() {
+    strictEqual(
+      options.objectPropertyOption({key1:"value"}, 'key100500'), options.None,
+      '`options.objectPropertyOption({key1:"value"}, "key100500")` should return options#None due to `"key100500"` not found'
+    );
+    strictEqual(
+      options.objectPropertyOption(["something"], 1), options.None,
+      '`options.objectPropertyOption(["something"], 1)` should return options#None due to only one element in the array'
+    );
+  });
+  test('options#objectPropertyOption should return options#Some when property found', function() {
+    ok(
+      options.objectPropertyOption({key:"value"}, "key") !== options.None,
+      '`options.objectPropertyOption({key:"value"}, "key")` should not return options#None'
+    );
+    strictEqual(
+      options.objectPropertyOption({key:"value"}, "key").isEmpty(),
+      false,
+      '`options.objectPropertyOption({key:"value"}, "key")` should return not empty options#Option'
+    );
+    strictEqual(
+      options.objectPropertyOption({key:"value"}, "key").get(),
+      "value",
+      '`options.objectPropertyOption({key:"value"}, "key")` should return`Some("value")`'
+    );
+    ok(
+      options.objectPropertyOption(["something"], 0) !== options.None,
+      '`options.objectPropertyOption(["something"], 0)` should not return options#None'
+    );
+    strictEqual(
+      options.objectPropertyOption(["something"], 0).isEmpty(),
+      false,
+      '`options.objectPropertyOption(["something"], 0)` should return not empty options#Option'
+    );
+    strictEqual(
+      options.objectPropertyOption(["something"], 0).get(),
+      "something",
+      '`options.objectPropertyOption(["something"], 0)` should return`Some("something")`'
+    );
+  });
+
+  module('options#helperFns');
+  test('options#helperFns loaded', function() {
+    ok(options.helperFns, '`options.helperFns` should be defined');
+  });
+  test('helperFns#notEmptyArrayOrNothing loaded', function() {
+    ok(options.helperFns.notEmptyArrayOrNothing, '`options.helperFns.notEmptyArrayOrNothing` should be defined');
+  });
+  test('helperFns#notEmptyArrayOrNothing should return nothing, if non-array passed', function() {
+    (function(){
+      //noinspection JSCheckFunctionSignatures
+      var result = options.helperFns.notEmptyArrayOrNothing();
+      equal(
+        !!result, false,
+        'helperFns#notEmptyArrayOrNothing should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        'result, wrapped with option should be options#None'
+      );
+    })();
+    (function(undefined){
+      var result = options.helperFns.notEmptyArrayOrNothing(undefined);
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(undefined)` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(undefined)` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing(null);
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(null)` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(null)` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing({key:"value"});
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing({key:"value"})` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing({key:"value"})` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing("something");
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing("something")` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing("something")` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing(true);
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(true)` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(true)` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing(new Date(1));
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(new Date(1))` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(new Date(1))` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing(1);
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(1)` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(1)` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing(/something/);
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(/something/)` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(/something/)` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing(function(){ return "something" });
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing(function(){ return "something" })` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing(function(){ return "something" })` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+  });
+  test('helperFns#notEmptyArrayOrNothing should return nothing, if the array passed is empty', function(){
+    (function(){
+      var result = options.helperFns.notEmptyArrayOrNothing([]);
+      equal(
+        !!result, false,
+        '`options.helperFns.notEmptyArrayOrNothing([])` should return a falsy value'
+      );
+      strictEqual(
+        options.Option(result), options.None,
+        '`options.helperFns.notEmptyArrayOrNothing([])` should return result, which, when wrapped with option, should be options#None'
+      );
+    })();
+  });
+  test('helperFns#notEmptyArrayOrNothing should return the array, if it is not empty', function(){
+    strictEqual(
+      options.helperFns.notEmptyArrayOrNothing(_somethingArray),
+      _somethingArray,
+      '`options.helperFns.notEmptyArrayOrNothing(["something"])` should return`["something"]`'
+    );
   });
 })(QUnit);
