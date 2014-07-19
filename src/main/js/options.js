@@ -26,7 +26,10 @@
 })(this, function (_) {
   var options = {},
       _isEmpty = function(v) {
-        return (_.isUndefined(v) || _.isNull(v))
+        return (_.isUndefined(v) ||
+                _.isNull(v) ||
+                _.isNaN(v)
+        )
       };
   options.Option = function(v){
     return _isEmpty(v)? options.None : options.Some(v)
